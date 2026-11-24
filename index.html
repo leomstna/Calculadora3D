@@ -29,6 +29,13 @@
         th, td { text-align: center; padding: 10px; border: 1px solid #444; }
         th { background: #333; color: #4caf50; }
     </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calculadora 3D">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
 <body>
 
@@ -36,14 +43,6 @@
     <h1>Calculadora 3D - Custos e Vendas</h1>
     
     <div class="grid">
-        <div class="input-group">
-            <label>Altura da Peça (cm)</label>
-            <input type="number" id="altura" value="5" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>Largura da Peça (cm)</label>
-            <input type="number" id="largura" value="5" step="0.1">
-        </div>
         <div class="input-group">
             <label>Preço do Filamento (R$/kg)</label>
             <input type="number" id="precoFilamento" value="120" step="0.01">
@@ -82,7 +81,6 @@
 
     <div id="results" class="results">
         <h2>Resumo da Produção</h2>
-        <div class="info-row" id="outDimensoes"></div>
         
         <div class="grid">
             <div class="results-card">
@@ -118,8 +116,6 @@
 <script>
     function calcular() {
         // Puxando valores
-        const altura = parseFloat(document.getElementById('altura').value);
-        const largura = parseFloat(document.getElementById('largura').value);
         const precoFilamento = parseFloat(document.getElementById('precoFilamento').value);
         const peso = parseFloat(document.getElementById('peso').value);
         const tempo = parseFloat(document.getElementById('tempo').value);
@@ -128,9 +124,6 @@
         const valorMaquina = parseFloat(document.getElementById('valorMaquina').value);
         const insumos = parseFloat(document.getElementById('insumos').value);
         const falha = parseFloat(document.getElementById('falha').value);
-
-        // Atualizando info das dimensões
-        document.getElementById('outDimensoes').innerText = `Tamanho da Peça: ${altura} cm (Altura) x ${largura} cm (Largura)`;
 
         // Cálculos
         const custoMaterial = (peso / 1000) * precoFilamento;
@@ -182,5 +175,6 @@
         document.getElementById('results').style.display = 'block';
     }
 </script>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));</script>
 </body>
 </html>
