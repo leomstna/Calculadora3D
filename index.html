@@ -97,11 +97,22 @@ h1{font-size:clamp(26px,4.2vw,42px);font-weight:700;letter-spacing:-.03em;line-h
 .cl small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
 .cl b{font-variant-numeric:tabular-nums;white-space:nowrap}
 .hint{color:var(--mut);font-size:13px;margin:-6px 0 12px;line-height:1.5}
+.scan{padding:14px;border:1px dashed rgba(190,242,58,.4);border-radius:14px;background:rgba(190,242,58,.05);margin-bottom:6px}
+.btn.ghost{margin-top:0;background:transparent;color:var(--lime);border:1px solid var(--lime);font-size:15px}
+.btn.ghost:disabled{opacity:.6;cursor:wait}
+.btn.sm{width:auto;padding:10px 22px;font-size:14px;margin-top:10px}
+#scanMsg{font-size:13px;color:var(--g1);margin-top:10px;line-height:1.5}
+.key{margin-top:10px;font-size:13px}
+.fld input.flash{animation:flash 1.3s}
+@keyframes flash{0%,60%{box-shadow:0 0 0 4px rgba(190,242,58,.55);border-color:var(--lime)}}
+.layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;align-items:start;margin-bottom:14px}
+.colL,.colR{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sum{display:none}
 /* Tabela */
 .tw{overflow-x:auto}
-table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0 6px}
-th{font-size:12px;color:var(--mut);font-weight:500;text-align:left;padding:6px 12px}
-td{padding:13px 12px;background:var(--card2);font-variant-numeric:tabular-nums}
+table{width:100%;min-width:0;font-size:13px;border-collapse:separate;border-spacing:0 6px}
+th{font-size:12px;color:var(--mut);font-weight:500;text-align:left;padding:6px 8px}
+td{padding:12px 8px;background:var(--card2);font-variant-numeric:tabular-nums}
 td:first-child{border-radius:12px 0 0 12px}
 td:last-child{border-radius:0 12px 12px 0;color:var(--g2);font-weight:700}
 tbody tr{animation:rowin .6s both}
@@ -140,6 +151,25 @@ ol{margin:10px 0 2px;padding-left:20px;line-height:1.7}
  td:first-child{font-size:15px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
  td[data-l]::before{content:attr(data-l);color:var(--mut);font-weight:400}
 }
+@media(max-width:900px){
+ .layout{grid-template-columns:1fr}
+ #brandTxt{display:none}
+ .brand{margin:0 6px 0 2px}
+ .nav{flex:1;gap:4px}
+ .nav a{flex:1;justify-content:center;padding:10px 8px;font-size:13px;gap:6px}
+ .eyebrow,.sub{display:none}
+ #visao h1{font-size:24px;margin-bottom:16px}
+ .main{padding-bottom:110px}
+ .main[data-tab=dados] .colR,.main[data-tab=dados] #instalar{display:none}
+ .main[data-tab=resultado] .colL,.main[data-tab=resultado] #instalar,.main[data-tab=resultado] .sum{display:none}
+ .main[data-tab=app] .layout,.main[data-tab=app] .sum{display:none}
+ .sum{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:20;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;background:rgba(28,29,31,.96);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(190,242,58,.35);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+ .sum div{flex:1;min-width:0}
+ .sum small{display:block;font-size:11px;color:var(--mut)}
+ .sum b{font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}
+ .sum .btn{flex:none;margin:0;padding:11px 16px;font-size:14px}
+}
+@media(max-width:400px){.nav a svg{display:none}}
 </style>
 </head>
 <body>
@@ -162,13 +192,12 @@ ol{margin:10px 0 2px;padding-left:20px;line-height:1.7}
   <div class="lbl">DASHBOARDS</div>
   <nav class="nav">
    <a href="#entradas" class="on"><svg><use href="#i-sl"/></svg><span data-sc>Dados da peça</span></a>
-   <a href="#custos"><svg><use href="#i-grid"/></svg><span data-sc>Custo</span></a>
-   <a href="#vendas"><svg><use href="#i-tr"/></svg><span data-sc>Vender</span></a>
+   <a href="#custos"><svg><use href="#i-grid"/></svg><span data-sc>Resultado</span></a>
    <a href="#instalar"><svg><use href="#i-dl"/></svg><span data-sc>Instalar app</span></a>
   </nav>
  </aside>
 
- <main class="main">
+ <main class="main" data-tab="dados">
   <div class="top"><div>Dashboards / <b>Calculadora</b></div><div class="pill"><i></i>Atualiza ao digitar</div></div>
 
   <section id="visao" data-sec>
@@ -177,39 +206,56 @@ ol{margin:10px 0 2px;padding-left:20px;line-height:1.7}
    <p class="sub" style="margin-bottom:24px">Preencha os dados da peça. O custo e o preço de venda aparecem sozinhos.</p>
   </section>
 
-  <div class="row2">
+  <div class="layout">
+   <div class="colL">
    <section id="entradas" data-sec class="card rv">
     <div class="ct"><span class="sp" data-split="c">1. Dados da peça</span></div>
+    <div class="scan">
+     <button class="btn ghost" id="btnScan" type="button">📷 Preencher com foto do fatiador</button>
+     <input type="file" id="foto" accept="image/*" hidden>
+     <div id="scanMsg" role="status">Tire foto (ou escolha um print) da tela com peso e tempo do fatiamento.</div>
+     <details class="key" id="keyBox"><summary>Chave do Gemini (grátis, 1 vez)</summary>
+      <div class="fld" style="margin-top:10px"><label>Cole sua chave de API</label><input type="password" id="gkey" autocomplete="off" placeholder="AIza..."><small class="hn">Gere em aistudio.google.com/apikey. Fica salva só neste aparelho.</small></div>
+      <button class="btn sm" id="btnKey" type="button">Salvar chave</button>
+     </details>
+    </div>
     <h3 class="gh">Material</h3>
-    <div class="form"><div class="fld"><label>Preço do filamento (R$/kg)</label><input type="number" inputmode="decimal" id="precoFilamento" value="120" step="0.01"></div><div class="fld"><label>Peso da peça (g)</label><input type="number" inputmode="decimal" id="peso" value="12" step="1"></div></div>
+    <div class="form"><div class="fld"><label>Preço do filamento (R$/kg)</label><input type="number" inputmode="decimal" id="precoFilamento" value="120" step="0.01"></div><div class="fld"><label>Peso total da mesa (g)</label><input type="number" inputmode="decimal" id="peso" value="12" step="1"><small class="hn">como mostra o fatiador</small></div></div>
     <h3 class="gh">Impressão</h3>
-    <div class="form"><div class="fld"><label>Tempo de impressão (horas)</label><input type="number" inputmode="decimal" id="tempo" value="0.5" step="0.1"></div><div class="fld"><label>Consumo da impressora (W)</label><input type="number" inputmode="decimal" id="potencia" value="250" step="1"></div><div class="fld"><label>Preço do kWh (R$)</label><input type="number" inputmode="decimal" id="kwh" value="0.95" step="0.01"></div></div>
+    <div class="form"><div class="fld"><label>Tempo total da mesa (horas)</label><input type="number" inputmode="decimal" id="tempo" value="0.5" step="0.1"><small class="hn">ex.: 1h30 = 1.5</small></div><div class="fld"><label>Consumo da impressora (W)</label><input type="number" inputmode="decimal" id="potencia" value="250" step="1"></div><div class="fld"><label>Preço do kWh (R$)</label><input type="number" inputmode="decimal" id="kwh" value="0.95" step="0.01"></div><div class="fld"><label>Cópias na mesa</label><input type="number" inputmode="numeric" id="copias" value="1" min="1" step="1"><small class="hn">peças impressas juntas</small></div></div>
     <h3 class="gh">Extras</h3>
-    <div class="form"><div class="fld"><label>Valor da impressora (R$)</label><input type="number" inputmode="decimal" id="valorMaquina" value="1500" step="1"><small class="hn">usado para calcular o desgaste</small></div><div class="fld"><label>Insumos/acabamento (R$)</label><input type="number" inputmode="decimal" id="insumos" value="0.25" step="0.01"><small class="hn">argola, caixa...</small></div><div class="fld"><label>Margem de falha (%)</label><input type="number" inputmode="decimal" id="falha" value="10" step="1"><small class="hn">cobre peças que dão errado</small></div></div>
+    <div class="form"><div class="fld"><label>Valor da impressora (R$)</label><input type="number" inputmode="decimal" id="valorMaquina" value="1500" step="1"><small class="hn">usado para calcular o desgaste</small></div><div class="fld"><label>Insumos/acabamento (R$)</label><input type="number" inputmode="decimal" id="insumos" value="0.25" step="0.01"><small class="hn">argola, caixa...</small></div><div class="fld"><label>Margem de falha (%)</label><input type="number" inputmode="decimal" id="falha" value="10" step="1"><small class="hn">cobre peças que dão errado</small></div><div class="fld"><label>Comissão do modelador (R$)</label><input type="number" inputmode="decimal" id="comissao" value="0" step="0.01"><small class="hn">valor fixo por peça</small></div></div>
     <button class="btn" id="btnCalc" type="button"><span class="shiny">Calcular Custos e Preços</span></button>
    </section>
+   </div>
+   <div class="colR">
 
    <section id="custos" data-sec class="card rv" style="--d:120ms">
     <div class="ct"><span class="sp" data-split="c">2. Quanto custa fazer</span></div>
     <div class="big"><small>Custo de 1 peça</small><b id="outCustoTotal">R$ 0,00</b></div>
+    <p class="hint" id="copiasInfo" style="text-align:center;margin:0 0 6px"></p>
     <ul class="cl">
      <li><span>Material<small>filamento gasto</small></span><b id="outMaterial">R$ 0,00</b></li>
      <li><span>Energia<small>conta de luz</small></span><b id="outEnergia">R$ 0,00</b></li>
      <li><span>Desgaste da impressora<small>depreciação</small></span><b id="outDepreciacao">R$ 0,00</b></li>
      <li><span>Insumos<small>argola, caixa...</small></span><b id="outInsumos">R$ 0,00</b></li>
      <li><span>Margem de falha<small>reserva para erros</small></span><b id="outFalha">R$ 0,00</b></li>
+     <li><span>Comissão do modelador<small>valor por peça</small></span><b id="outComissao">R$ 0,00</b></li>
     </ul>
    </section>
-  </div>
 
-  <section id="vendas" data-sec class="card rv" style="margin-bottom:14px">
+   <section id="vendas" data-sec data-nav="custos" class="card rv" style="--d:200ms">
    <div class="ct"><span class="sp" data-split="c">3. Por quanto vender</span></div>
    <p class="hint">Quanto mais peças no pacote, menor o preço de cada uma. O lucro já desconta todos os custos acima.</p>
    <div class="tw"><table>
     <thead><tr><th>Pacote</th><th>Preço de cada peça</th><th>Cliente paga</th><th>Seu lucro</th></tr></thead>
     <tbody id="tabelaVendas"></tbody>
    </table></div>
+   <button class="btn ghost sm" id="btnExport" type="button" style="margin-top:14px">⬇️ Exportar para planilha</button>
+   <div id="expMsg" role="status" style="font-size:13px;color:var(--g1);margin-top:10px"></div>
   </section>
+   </div>
+  </div>
 
   <section id="instalar" data-sec class="card pro rv">
    <div>
@@ -231,6 +277,11 @@ ol{margin:10px 0 2px;padding-left:20px;line-height:1.7}
      <li>Toque em <b>Adicionar</b>. O ícone aparece na tela inicial.</li></ol></details>
    </div>
   </section>
+  <div class="sum">
+   <div><small>Custo de 1 peça</small><b id="sumCusto">R$ 0,00</b></div>
+   <div><small>Venda avulsa</small><b id="sumPreco">R$ 0,00</b></div>
+   <button class="btn sm" id="btnVer" type="button"><span class="shiny">Ver resultado →</span></button>
+  </div>
  </main>
 </div>
 
@@ -270,7 +321,7 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 document.querySelectorAll('.rv,.sp').forEach(el=>io.observe(el));
 /* Scrollspy */
 const links=[...document.querySelectorAll('.nav a')];
-const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-35% 0px -55% 0px'});
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!matchMedia('(max-width:900px)').matches)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+(e.target.dataset.nav||e.target.id)))}),{rootMargin:'-35% 0px -55% 0px'});
 document.querySelectorAll('[data-sec]').forEach(s=>so.observe(s));
 /* Spotlight */
 document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.card');if(c){const r=c.getBoundingClientRect();c.style.setProperty('--mx',e.clientX-r.left+'px');c.style.setProperty('--my',e.clientY-r.top+'px')}});
@@ -278,24 +329,104 @@ document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.c
 /* Cálculo */
 function calcular(){
   const n=id=>parseFloat($(id).value)||0;
-  const pf=n('precoFilamento'),peso=n('peso'),tempo=n('tempo'),pot=n('potencia'),kwh=n('kwh'),vm=n('valorMaquina'),ins=n('insumos'),fal=n('falha');
-  const mat=(peso/1000)*pf,en=(pot/1000)*tempo*kwh,dep=(vm/4000)*tempo;
-  const sub=mat+en+dep+ins,vf=sub*(fal/100),tot=sub+vf;
+  const pf=n('precoFilamento'),peso=n('peso'),tempo=n('tempo'),pot=n('potencia'),kwh=n('kwh'),vm=n('valorMaquina'),ins=n('insumos'),fal=n('falha'),com=n('comissao'),cop=Math.max(1,Math.round(n('copias'))||1);
+  const mat=(peso/1000)*pf/cop,en=(pot/1000)*tempo*kwh/cop,dep=(vm/4000)*tempo/cop;
+  $('copiasInfo').textContent=cop>1?`Material, energia e desgaste divididos entre ${cop} cópias na mesa`:'';
+  const sub=mat+en+dep+ins,vf=sub*(fal/100),tot=sub+vf+com;
   count($('outMaterial'),mat);count($('outEnergia'),en);count($('outDepreciacao'),dep);
-  count($('outInsumos'),ins);count($('outFalha'),vf);count($('outCustoTotal'),tot);
+  count($('outInsumos'),ins);count($('outFalha'),vf);count($('outComissao'),com);count($('outCustoTotal'),tot);
 
   const vendas=[{qtd:1,nome:'1 unidade (avulso)',mult:3.5},{qtd:20,nome:'Pacote 20 un.',mult:2.5},{qtd:70,nome:'Pacote 70 un.',mult:2.1},{qtd:100,nome:'Pacote 100 un.',mult:1.8}];
-  let html='';
+  let html='';const rows=[];
   vendas.forEach((v,i)=>{
-    const pu=Math.ceil(tot*v.mult*10)/10,pp=pu*v.qtd,lucro=pp-tot*v.qtd;
+    const pu=Math.ceil(tot*v.mult*100-1e-9)/100,pp=pu*v.qtd,lucro=pp-tot*v.qtd;
+    rows.push([v.nome,v.qtd,pu,pp,lucro]);
     html+=`<tr style="animation-delay:${i*90}ms"><td><strong>${v.nome}</strong></td><td data-l="Preço de cada peça">${money(pu)}</td><td data-l="Cliente paga"><strong>${money(pp)}</strong></td><td data-l="Seu lucro">${money(lucro)}</td></tr>`;
   });
   $('tabelaVendas').innerHTML=html;
+  window.ULT={custos:[['Material',mat],['Energia',en],['Desgaste da impressora',dep],['Insumos',ins],['Margem de falha',vf],['Comissão do modelador',com]],tot,rows};
+  count($('sumCusto'),tot);count($('sumPreco'),rows[0][2]);
 }
 let tm;
 document.querySelectorAll('.form input').forEach(i=>i.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(calcular,250)}));
 $('btnCalc').addEventListener('click',calcular);
 calcular();
+
+/* Foto do fatiador (Gemini) */
+(function(){
+  const KEY='calc3d_gkey',msg=$('scanMsg'),btn=$('btnScan'),file=$('foto'),det=$('keyBox'),kin=$('gkey');
+  const get=()=>{try{return localStorage.getItem(KEY)||''}catch(e){return ''}};
+  const put=v=>{try{localStorage.setItem(KEY,v)}catch(e){}};
+  const MODELS=['gemini-3.5-flash','gemini-3.1-flash-lite','gemini-2.5-flash'];
+  const PROMPT='Esta imagem é a tela do resultado do fatiamento de um software de impressão 3D (Bambu Studio, Orca, Cura, PrusaSlicer, Creality Print etc.). Extraia: peso_g = peso total de filamento em gramas da mesa inteira (some se houver vários filamentos); tempo_horas = tempo total estimado de impressão em horas decimais (1h 30min = 1.5; 1d 2h = 26); copias = quantidade de objetos/peças na mesa, se aparecer. Use null para o que não aparecer. Responda somente JSON: {"peso_g":number|null,"tempo_horas":number|null,"copias":number|null}';
+  kin.value=get();
+  $('btnKey').addEventListener('click',()=>{const v=kin.value.trim();if(!v){msg.textContent='Cole a chave antes de salvar.';return}put(v);msg.textContent='Chave salva neste aparelho. Agora é só tirar a foto.';det.open=false});
+  btn.addEventListener('click',()=>{if(!get()){det.open=true;kin.focus();msg.textContent='Cole sua chave grátis do Gemini para usar a foto.';return}file.click()});
+  const toB64=f=>new Promise((ok,err)=>{const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL('image/jpeg',.85).split(',')[1])};img.onerror=()=>err(new Error('img'));img.src=u});
+  async function ask(b64,key){
+    let last;
+    for(const m of MODELS){
+      try{
+        const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{parts:[{text:PROMPT},{inline_data:{mime_type:'image/jpeg',data:b64}}]}],generationConfig:{responseMimeType:'application/json',temperature:0}})});
+        if(r.status===400||r.status===401||r.status===403){const j=await r.json().catch(()=>({})),t=(j.error&&j.error.message)||'';if(r.status!==400||/API key/i.test(t))throw Object.assign(new Error('key'),{fatal:true});last=new Error(t);continue}
+        if(!r.ok){last=new Error('HTTP '+r.status);continue}
+        const j=await r.json(),t=j.candidates[0].content.parts.map(p=>p.text||'').join('');
+        return JSON.parse(t.replace(/```json|```/g,'').trim());
+      }catch(e){if(e.fatal)throw e;last=e}
+    }
+    throw last||new Error('falha');
+  }
+  const num=v=>{v=typeof v==='string'?parseFloat(v.replace(',','.')):v;return typeof v==='number'&&isFinite(v)&&v>0?v:null};
+  const flash=id=>{const el=$(id);el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')};
+  file.addEventListener('change',async()=>{
+    const f=file.files[0];file.value='';if(!f)return;
+    btn.disabled=true;btn.textContent='Lendo a foto…';msg.textContent='';
+    try{
+      const r=await ask(await toB64(f),get());
+      const p=num(r.peso_g),t=num(r.tempo_horas),c=num(r.copias),ok=[];
+      if(p){$('peso').value=+p.toFixed(2);flash('peso');ok.push(fmt(p,1)+' g')}
+      if(t){$('tempo').value=+t.toFixed(2);flash('tempo');ok.push(fmt(t,2)+' h')}
+      if(c){$('copias').value=Math.max(1,Math.round(c));flash('copias');ok.push(Math.max(1,Math.round(c))+' cópia(s)')}
+      if(ok.length){calcular();msg.textContent='Preenchido: '+ok.join(' · ')+'. Confira os valores.'}
+      else msg.textContent='Não achei peso nem tempo na foto. Envie a tela com o resultado do fatiamento.';
+    }catch(e){
+      msg.textContent=e.fatal?'Chave inválida. Confira a chave do Gemini.':/429/.test(e.message)?'Limite grátis do Gemini atingido. Tente mais tarde ou preencha à mão.':'Não consegui ler a foto (precisa de internet). Tente de novo ou preencha à mão.';
+    }
+    btn.disabled=false;btn.textContent='📷 Preencher com foto do fatiador';
+  });
+})();
+
+/* Exportar para planilha (CSV: abre no Excel e no Google Planilhas) */
+(function(){
+  const q=v=>{v=String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const nf=v=>(Math.round(v*100)/100).toFixed(2).replace('.',',');
+  $('btnExport').addEventListener('click',async()=>{
+    calcular();const U=window.ULT,L=[];
+    L.push(['Calculadora de Impressão 3D'],['Data',new Date().toLocaleDateString('pt-BR')],[],['PARÂMETROS'],['Item','Valor']);
+    document.querySelectorAll('.form .fld').forEach(f=>L.push([f.querySelector('label').textContent,f.querySelector('input').value.replace('.',',')]));
+    L.push([],['CUSTO POR PEÇA (R$)']);
+    U.custos.forEach(c=>L.push([c[0],nf(c[1])]));
+    L.push(['Custo total',nf(U.tot)],[],['ESTRATÉGIA DE VENDA'],['Pacote','Quantidade','Preço de cada peça (R$)','Cliente paga (R$)','Seu lucro (R$)']);
+    U.rows.forEach(r=>L.push([r[0],r[1],nf(r[2]),nf(r[3]),nf(r[4])]));
+    const csv='\uFEFF'+L.map(r=>r.map(q).join(';')).join('\r\n');
+    const name='calculadora-3d-'+new Date().toISOString().slice(0,10)+'.csv',blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const file=new File([blob],name,{type:'text/csv'});
+    if(matchMedia('(pointer:coarse)').matches&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:'Calculadora 3D'});$('expMsg').textContent='Escolha Planilhas, Excel ou Arquivos para abrir ou salvar.';return}catch(e){if(e.name==='AbortError')return}
+    }
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    $('expMsg').textContent='Arquivo '+name+' gerado. Abra no Excel ou no Google Planilhas.';
+  });
+})();
+
+/* Abas no celular */
+(function(){
+  const main=document.querySelector('.main'),mq=matchMedia('(max-width:900px)'),ls=[...document.querySelectorAll('.nav a')];
+  const TAB={'#entradas':'dados','#custos':'resultado','#instalar':'app'};
+  const setTab=t=>{main.dataset.tab=t;ls.forEach(a=>a.classList.toggle('on',TAB[a.getAttribute('href')]===t));scrollTo({top:0,behavior:RM?'auto':'smooth'})};
+  ls.forEach(a=>a.addEventListener('click',e=>{if(!mq.matches)return;e.preventDefault();setTab(TAB[a.getAttribute('href')])}));
+  $('btnVer').addEventListener('click',()=>setTab('resultado'));
+})();
 
 /* Instalação (PWA) */
 (function(){
