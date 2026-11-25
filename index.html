@@ -1,179 +1,315 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Impressão 3D</title>
-    <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        h1, h2 { color: #4caf50; text-align: center; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        @media(max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-        .input-group { display: flex; flex-direction: column; }
-        label { font-size: 14px; margin-bottom: 5px; color: #bbb; }
-        input { padding: 10px; border: 1px solid #333; border-radius: 4px; background: #2c2c2c; color: #fff; font-size: 16px; }
-        input:focus { outline: none; border-color: #4caf50; }
-        button { width: 100%; padding: 15px; background: #4caf50; color: #fff; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #45a049; }
-        .results { margin-top: 30px; display: none; }
-        .results-card { background: #2c2c2c; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #4caf50; }
-        .results-card h3 { margin-top: 0; color: #fff; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        .row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .highlight { font-weight: bold; color: #4caf50; font-size: 18px; }
-        .info-row { color: #888; font-size: 14px; margin-bottom: 10px; text-align: center; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: center; padding: 10px; border: 1px solid #444; }
-        th { background: #333; color: #4caf50; }
-    </style>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Calculadora 3D">
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Calculadora de Impressão 3D</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#07140b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Calculadora 3D">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--win:#131415;--card:#1c1d1f;--card2:#232527;--line:rgba(255,255,255,.07);--tx:#f4f5f4;--mut:#8d9298;--lime:#bff23a;--g1:#e4ffc2;--g2:#b6f23a;--g3:#6cc72b;--g4:#3f8f1f;--g5:#2c6a17}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#07140b;color:var(--tx);min-height:100vh;padding:28px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* Aurora (fundo) */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#0f3d1f 0%,#07140b 70%)}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 18s ease-in-out infinite alternate}
+.aurora i:nth-child(1){width:46vw;height:46vw;left:-8vw;top:-10vw;background:#22c55e}
+.aurora i:nth-child(2){width:38vw;height:38vw;right:-6vw;top:20vh;background:#84e03a;opacity:.4;animation-duration:22s}
+.aurora i:nth-child(3){width:50vw;height:50vw;left:25vw;bottom:-25vw;background:#16a34a;animation-duration:26s}
+@keyframes drift{to{transform:translate(6vw,-5vh) scale(1.15)}}
+
+/* Janela */
+.app{max-width:1200px;margin:0 auto;background:rgba(19,20,21,.94);border:1px solid var(--line);border-radius:24px;display:grid;grid-template-columns:230px 1fr;box-shadow:0 30px 80px rgba(0,0,0,.55);overflow:clip}
+.side{padding:22px 16px;border-right:1px solid var(--line)}
+.brand{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.06em;font-size:14px;margin:0 8px 24px}
+.brand svg{width:26px;height:26px;flex:none}
+.lbl{font-size:11px;letter-spacing:.14em;color:var(--mut);margin:0 10px 8px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;color:var(--mut);text-decoration:none;font-size:14px;transition:.25s}
+.nav a svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav a.on{background:var(--lime);color:#0c1404;font-weight:600}
+.main{padding:26px 28px 32px;min-width:0}
+section{scroll-margin-top:16px}
+
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:13px;margin-bottom:22px}
+.top b{color:#fff;font-weight:500}
+.pill{display:inline-flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-size:12px;color:var(--g1)}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--g2);box-shadow:0 0 0 0 rgba(182,242,58,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(182,242,58,0)}100%{box-shadow:0 0 0 0 rgba(182,242,58,0)}}
+.eyebrow{font-size:12px;letter-spacing:.2em;font-weight:600;margin-bottom:10px}
+h1{font-size:clamp(26px,4.2vw,42px);font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.sub{color:var(--mut);font-size:14px;margin-top:10px}
+
+/* ReactBits: ShinyText */
+.shiny{--b:#0c1404;--s:#fff;background:linear-gradient(110deg,var(--b) 35%,var(--s) 50%,var(--b) 65%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.6s linear infinite}
+.shiny.l{--b:#7f858b}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+/* ReactBits: GradientText */
+.gt{background:linear-gradient(90deg,#e4ffc2,#b6f23a,#4ade80,#e4ffc2);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gt 6s linear infinite}
+@keyframes gt{to{background-position:300% 0}}
+/* ReactBits: SplitText / BlurText */
+.sp .w{display:inline-block;white-space:nowrap}
+.sp .c{display:inline-block;opacity:0;filter:blur(8px);transform:translateY(.5em);transition:opacity .6s,filter .6s,transform .6s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--i)*var(--st,30ms))}
+.sp.in .c{opacity:1;filter:none;transform:none}
+/* ReactBits: AnimatedContent */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+
+/* Cards (SpotlightCard) */
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(380px circle at var(--mx,50%) var(--my,0%),rgba(190,242,58,.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1}
+.ct{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.ct small{color:var(--mut);font-weight:400;font-size:12px}
+.row2{align-items:start;display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-bottom:14px}
+
+/* Formulário */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fld label{display:block;font-size:12px;color:var(--mut);margin-bottom:6px}
+.fld input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#151617;color:#fff;font:inherit;font-size:16px;transition:.25s}
+.fld input:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(190,242,58,.15)}
+.btn{width:100%;margin-top:16px;padding:15px;border:0;border-radius:999px;background:var(--lime);font:inherit;font-weight:700;font-size:16px;cursor:pointer;transition:transform .2s,box-shadow .3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(190,242,58,.35)}
+.btn:active{transform:scale(.98)}
+
+/* Donut */
+
+.gh{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--g2);margin:20px 0 10px}
+.ct+.gh{margin-top:0}
+.hn{display:block;font-size:11px;color:var(--mut);margin-top:5px}
+.big{text-align:center;padding:20px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(190,242,58,.16),rgba(63,143,31,.08));border:1px solid rgba(190,242,58,.25);margin-bottom:10px}
+.big small{display:block;color:var(--mut);font-size:13px;margin-bottom:6px}
+.big b{font-size:clamp(34px,6vw,46px);color:var(--lime);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.cl{list-style:none;padding:0;margin:0}
+.cl li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.cl li:last-child{border-bottom:0}
+.cl small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.cl b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.hint{color:var(--mut);font-size:13px;margin:-6px 0 12px;line-height:1.5}
+/* Tabela */
+.tw{overflow-x:auto}
+table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0 6px}
+th{font-size:12px;color:var(--mut);font-weight:500;text-align:left;padding:6px 12px}
+td{padding:13px 12px;background:var(--card2);font-variant-numeric:tabular-nums}
+td:first-child{border-radius:12px 0 0 12px}
+td:last-child{border-radius:0 12px 12px 0;color:var(--g2);font-weight:700}
+tbody tr{animation:rowin .6s both}
+@keyframes rowin{from{opacity:0;transform:translateX(-14px)}}
+
+/* Gráfico */
+
+/* Instalar */
+.pro{background:radial-gradient(120% 150% at 100% 100%,#3f9a1f 0%,#1d4d12 38%,#16221a 75%);display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:center}
+.badge{display:inline-flex;gap:6px;align-items:center;background:rgba(0,0,0,.35);border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-size:12px;color:var(--g1);margin-bottom:14px}
+.pro h2{font-size:clamp(30px,5vw,52px);letter-spacing:-.03em;line-height:1.05}
+.pro p{color:#c6d4c0;font-size:14px;margin:12px 0 4px;line-height:1.5}
+.pro .btn{width:auto;padding:14px 34px}
+details{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;font-size:14px;color:#cfd9ca}
+summary{cursor:pointer;font-weight:600;color:var(--g1)}
+ol{margin:10px 0 2px;padding-left:20px;line-height:1.7}
+
+@media(max-width:900px){
+ body{padding:12px}
+ .app{grid-template-columns:1fr;border-radius:18px}
+ .side{display:flex;align-items:center;gap:6px;padding:12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;position:sticky;top:0;z-index:10;background:#131415}
+ .brand{margin:0 8px 0 0;white-space:nowrap}
+ .lbl{display:none}
+ .nav{flex-direction:row}
+ .nav a{white-space:nowrap}
+ .main{padding:18px 14px 26px}
+ .row2,.pro{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv,.sp .c{opacity:1!important;transform:none!important;filter:none!important}}
+@media(max-width:600px){
+ table{min-width:0}
+ table,tbody,tr,td{display:block}
+ thead{display:none}
+ tbody tr{background:var(--card2);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+ td{display:flex;justify-content:space-between;gap:12px;background:none;padding:6px 0;border-radius:0!important}
+ td:first-child{font-size:15px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+ td[data-l]::before{content:attr(data-l);color:var(--mut);font-weight:400}
+}
+</style>
 </head>
 <body>
+<div class="aurora"><i></i><i></i><i></i></div>
 
-<div class="container">
-    <h1>Calculadora 3D - Custos e Vendas</h1>
-    
-    <div class="grid">
-        <div class="input-group">
-            <label>Preço do Filamento (R$/kg)</label>
-            <input type="number" id="precoFilamento" value="120" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Peso da Peça (g)</label>
-            <input type="number" id="peso" value="12" step="1">
-        </div>
-        <div class="input-group">
-            <label>Tempo de Impressão (Horas)</label>
-            <input type="number" id="tempo" value="0.5" step="0.1">
-        </div>
-        <div class="input-group">
-            <label>Consumo da Impressora (W)</label>
-            <input type="number" id="potencia" value="250" step="1">
-        </div>
-        <div class="input-group">
-            <label>Valor do kWh (R$)</label>
-            <input type="number" id="kwh" value="0.95" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Valor da Impressora (R$)</label>
-            <input type="number" id="valorMaquina" value="1500" step="1">
-        </div>
-        <div class="input-group">
-            <label>Insumos/Acabamento (Argola, caixa. R$)</label>
-            <input type="number" id="insumos" value="0.25" step="0.01">
-        </div>
-        <div class="input-group">
-            <label>Margem de Falha (%)</label>
-            <input type="number" id="falha" value="10" step="1">
-        </div>
-    </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></symbol>
+ <symbol id="i-sl" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+ <symbol id="i-pie" viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12A9 9 0 1 1 12 3"/></symbol>
+ <symbol id="i-tr" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+ <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+</svg>
 
-    <button onclick="calcular()">Calcular Custos e Preços</button>
+<div class="app">
+ <aside class="side">
+  <div class="brand">
+   <svg viewBox="0 0 32 32"><path d="M16 3l11 6v14l-11 6L5 23V9z" fill="#2c6a17"/><path d="M16 3l11 6-11 6L5 9z" fill="#e4ffc2"/><path d="M16 15l11-6v14l-11 6z" fill="#6cc72b"/></svg>
+   <span id="brandTxt">CALCULADORA 3D</span>
+  </div>
+  <div class="lbl">DASHBOARDS</div>
+  <nav class="nav">
+   <a href="#entradas" class="on"><svg><use href="#i-sl"/></svg><span data-sc>Dados da peça</span></a>
+   <a href="#custos"><svg><use href="#i-grid"/></svg><span data-sc>Custo</span></a>
+   <a href="#vendas"><svg><use href="#i-tr"/></svg><span data-sc>Vender</span></a>
+   <a href="#instalar"><svg><use href="#i-dl"/></svg><span data-sc>Instalar app</span></a>
+  </nav>
+ </aside>
 
-    <div id="results" class="results">
-        <h2>Resumo da Produção</h2>
-        
-        <div class="grid">
-            <div class="results-card">
-                <h3>Custo de Produção (Unitário)</h3>
-                <div class="row"><span>Material:</span> <span id="outMaterial"></span></div>
-                <div class="row"><span>Energia:</span> <span id="outEnergia"></span></div>
-                <div class="row"><span>Depreciação:</span> <span id="outDepreciacao"></span></div>
-                <div class="row"><span>Insumos Extras:</span> <span id="outInsumos"></span></div>
-                <div class="row"><span>Margem de Falha:</span> <span id="outFalha"></span></div>
-                <div class="row highlight"><span style="color:#fff">Custo Total:</span> <span id="outCustoTotal"></span></div>
-            </div>
-        </div>
+ <main class="main">
+  <div class="top"><div>Dashboards / <b>Calculadora</b></div><div class="pill"><i></i>Atualiza ao digitar</div></div>
 
-        <h2>Estratégia de Venda Recomendada</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Pacote</th>
-                        <th>Preço Sugerido (Unidade)</th>
-                        <th>Preço Final (Pacote)</th>
-                        <th>Seu Lucro Limpo</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaVendas">
-                    <!-- Gerado via JS -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+  <section id="visao" data-sec>
+   <div class="eyebrow"><span class="shiny l">CUSTOS E VENDAS</span></div>
+   <h1 class="bt" style="--st:90ms" data-split="w">Calculadora de Impressão 3D</h1>
+   <p class="sub" style="margin-bottom:24px">Preencha os dados da peça. O custo e o preço de venda aparecem sozinhos.</p>
+  </section>
+
+  <div class="row2">
+   <section id="entradas" data-sec class="card rv">
+    <div class="ct"><span class="sp" data-split="c">1. Dados da peça</span></div>
+    <h3 class="gh">Material</h3>
+    <div class="form"><div class="fld"><label>Preço do filamento (R$/kg)</label><input type="number" inputmode="decimal" id="precoFilamento" value="120" step="0.01"></div><div class="fld"><label>Peso da peça (g)</label><input type="number" inputmode="decimal" id="peso" value="12" step="1"></div></div>
+    <h3 class="gh">Impressão</h3>
+    <div class="form"><div class="fld"><label>Tempo de impressão (horas)</label><input type="number" inputmode="decimal" id="tempo" value="0.5" step="0.1"></div><div class="fld"><label>Consumo da impressora (W)</label><input type="number" inputmode="decimal" id="potencia" value="250" step="1"></div><div class="fld"><label>Preço do kWh (R$)</label><input type="number" inputmode="decimal" id="kwh" value="0.95" step="0.01"></div></div>
+    <h3 class="gh">Extras</h3>
+    <div class="form"><div class="fld"><label>Valor da impressora (R$)</label><input type="number" inputmode="decimal" id="valorMaquina" value="1500" step="1"><small class="hn">usado para calcular o desgaste</small></div><div class="fld"><label>Insumos/acabamento (R$)</label><input type="number" inputmode="decimal" id="insumos" value="0.25" step="0.01"><small class="hn">argola, caixa...</small></div><div class="fld"><label>Margem de falha (%)</label><input type="number" inputmode="decimal" id="falha" value="10" step="1"><small class="hn">cobre peças que dão errado</small></div></div>
+    <button class="btn" id="btnCalc" type="button"><span class="shiny">Calcular Custos e Preços</span></button>
+   </section>
+
+   <section id="custos" data-sec class="card rv" style="--d:120ms">
+    <div class="ct"><span class="sp" data-split="c">2. Quanto custa fazer</span></div>
+    <div class="big"><small>Custo de 1 peça</small><b id="outCustoTotal">R$ 0,00</b></div>
+    <ul class="cl">
+     <li><span>Material<small>filamento gasto</small></span><b id="outMaterial">R$ 0,00</b></li>
+     <li><span>Energia<small>conta de luz</small></span><b id="outEnergia">R$ 0,00</b></li>
+     <li><span>Desgaste da impressora<small>depreciação</small></span><b id="outDepreciacao">R$ 0,00</b></li>
+     <li><span>Insumos<small>argola, caixa...</small></span><b id="outInsumos">R$ 0,00</b></li>
+     <li><span>Margem de falha<small>reserva para erros</small></span><b id="outFalha">R$ 0,00</b></li>
+    </ul>
+   </section>
+  </div>
+
+  <section id="vendas" data-sec class="card rv" style="margin-bottom:14px">
+   <div class="ct"><span class="sp" data-split="c">3. Por quanto vender</span></div>
+   <p class="hint">Quanto mais peças no pacote, menor o preço de cada uma. O lucro já desconta todos os custos acima.</p>
+   <div class="tw"><table>
+    <thead><tr><th>Pacote</th><th>Preço de cada peça</th><th>Cliente paga</th><th>Seu lucro</th></tr></thead>
+    <tbody id="tabelaVendas"></tbody>
+   </table></div>
+  </section>
+
+  <section id="instalar" data-sec class="card pro rv">
+   <div>
+    <div class="badge">📲 App grátis</div>
+    <h2 class="gt">Faça o download pra usar offline</h2>
+    <p>Instale no celular e use offline, direto da tela inicial, sem loja de aplicativos.</p>
+    <button class="btn" id="btnInstall" type="button"><span class="shiny">Instalar app</span></button>
+   </div>
+   <div>
+    <details id="tutAndroid"><summary>Android (Chrome)</summary><ol>
+     <li>Abra este site no <b>Chrome</b>.</li>
+     <li>Toque no menu <b>⋮</b> (canto superior direito).</li>
+     <li>Toque em <b>Instalar app</b> (ou <b>Adicionar à tela inicial</b>).</li>
+     <li>Confirme em <b>Instalar</b>. O ícone aparece na tela inicial.</li></ol></details>
+    <details id="tutIos"><summary>iPhone / iPad (Safari)</summary><ol>
+     <li>Abra este site no <b>Safari</b> (outros navegadores não instalam no iOS).</li>
+     <li>Toque em <b>Compartilhar</b> (quadrado com seta para cima).</li>
+     <li>Role e toque em <b>Adicionar à Tela de Início</b>.</li>
+     <li>Toque em <b>Adicionar</b>. O ícone aparece na tela inicial.</li></ol></details>
+   </div>
+  </section>
+ </main>
 </div>
 
 <script>
-    function calcular() {
-        // Puxando valores
-        const precoFilamento = parseFloat(document.getElementById('precoFilamento').value);
-        const peso = parseFloat(document.getElementById('peso').value);
-        const tempo = parseFloat(document.getElementById('tempo').value);
-        const potencia = parseFloat(document.getElementById('potencia').value);
-        const kwh = parseFloat(document.getElementById('kwh').value);
-        const valorMaquina = parseFloat(document.getElementById('valorMaquina').value);
-        const insumos = parseFloat(document.getElementById('insumos').value);
-        const falha = parseFloat(document.getElementById('falha').value);
+const $=id=>document.getElementById(id),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const fmt=(v,d=2)=>v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const money=v=>'R$ '+fmt(v);
 
-        // Cálculos
-        const custoMaterial = (peso / 1000) * precoFilamento;
-        const custoEnergia = (potencia / 1000) * tempo * kwh;
-        const vidaUtilHoras = 4000;
-        const custoDepreciacao = (valorMaquina / vidaUtilHoras) * tempo;
-        
-        const subTotal = custoMaterial + custoEnergia + custoDepreciacao + insumos;
-        const valorFalha = subTotal * (falha / 100);
-        const custoTotal = subTotal + valorFalha;
+/* CountUp (ReactBits) */
+function count(el,to,f=money){
+  const from=el._v||0;el._v=to;cancelAnimationFrame(el._r);
+  if(RM){el.textContent=f(to);return}
+  const t0=performance.now(),d=900;
+  (function step(n){const p=Math.min((n-t0)/d,1),e=1-Math.pow(1-p,3);el.textContent=f(from+(to-from)*e);if(p<1)el._r=requestAnimationFrame(step)})(t0);
+}
+/* SplitText / BlurText (ReactBits) */
+function split(el){
+  const t=el.textContent,mode=el.dataset.split;el.setAttribute('aria-label',t);el.textContent='';el.classList.add('sp');let i=0;
+  t.split(' ').forEach((word,wi,arr)=>{
+    const w=document.createElement('span');w.className='w';w.setAttribute('aria-hidden','true');
+    if(mode==='w'){w.classList.add('c');w.style.setProperty('--i',i++);w.textContent=word}
+    else[...word].forEach(ch=>{const c=document.createElement('span');c.className='c';c.style.setProperty('--i',i++);c.textContent=ch;w.appendChild(c)});
+    el.appendChild(w);if(wi<arr.length-1)el.appendChild(document.createTextNode(' '));
+  });
+}
+document.querySelectorAll('[data-split]').forEach(split);
+/* DecryptedText (ReactBits) */
+function scramble(el){
+  if(RM)return;const t=el.dataset.t||(el.dataset.t=el.textContent),ch='!<>-_/[]{}=+*^?#%';let f=0;clearInterval(el._s);
+  el._s=setInterval(()=>{el.textContent=[...t].map((c,i)=>c===' '||i<f/2?c:ch[Math.random()*ch.length|0]).join('');if(++f>t.length*2+2){clearInterval(el._s);el.textContent=t}},35);
+}
+scramble($('brandTxt'));
+document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('mouseenter',()=>scramble(a.querySelector('[data-sc]'))));
 
-        // Custos formatados
-        document.getElementById('outMaterial').innerText = `R$ ${custoMaterial.toFixed(2)}`;
-        document.getElementById('outEnergia').innerText = `R$ ${custoEnergia.toFixed(2)}`;
-        document.getElementById('outDepreciacao').innerText = `R$ ${custoDepreciacao.toFixed(2)}`;
-        document.getElementById('outInsumos').innerText = `R$ ${insumos.toFixed(2)}`;
-        document.getElementById('outFalha').innerText = `R$ ${valorFalha.toFixed(2)}`;
-        document.getElementById('outCustoTotal').innerText = `R$ ${custoTotal.toFixed(2)}`;
+/* Reveal ao rolar */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.rv,.sp').forEach(el=>io.observe(el));
+/* Scrollspy */
+const links=[...document.querySelectorAll('.nav a')];
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-35% 0px -55% 0px'});
+document.querySelectorAll('[data-sec]').forEach(s=>so.observe(s));
+/* Spotlight */
+document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.card');if(c){const r=c.getBoundingClientRect();c.style.setProperty('--mx',e.clientX-r.left+'px');c.style.setProperty('--my',e.clientY-r.top+'px')}});
 
-        // Estratégia
-        const vendas = [
-            { qtd: 1, nome: "1 Unidade (Avulso)", mult: 3.5 },
-            { qtd: 20, nome: "Pacote 20 un.", mult: 2.5 },
-            { qtd: 70, nome: "Pacote 70 un.", mult: 2.1 },
-            { qtd: 100, nome: "Pacote 100 un.", mult: 1.8 }
-        ];
+/* Cálculo */
+function calcular(){
+  const n=id=>parseFloat($(id).value)||0;
+  const pf=n('precoFilamento'),peso=n('peso'),tempo=n('tempo'),pot=n('potencia'),kwh=n('kwh'),vm=n('valorMaquina'),ins=n('insumos'),fal=n('falha');
+  const mat=(peso/1000)*pf,en=(pot/1000)*tempo*kwh,dep=(vm/4000)*tempo;
+  const sub=mat+en+dep+ins,vf=sub*(fal/100),tot=sub+vf;
+  count($('outMaterial'),mat);count($('outEnergia'),en);count($('outDepreciacao'),dep);
+  count($('outInsumos'),ins);count($('outFalha'),vf);count($('outCustoTotal'),tot);
 
-        let tabelaHTML = "";
-        
-        vendas.forEach(venda => {
-            let precoUnitario = custoTotal * venda.mult;
-            precoUnitario = Math.ceil(precoUnitario * 10) / 10; 
-            
-            let precoPacote = precoUnitario * venda.qtd;
-            let custoPacote = custoTotal * venda.qtd;
-            let lucro = precoPacote - custoPacote;
+  const vendas=[{qtd:1,nome:'1 unidade (avulso)',mult:3.5},{qtd:20,nome:'Pacote 20 un.',mult:2.5},{qtd:70,nome:'Pacote 70 un.',mult:2.1},{qtd:100,nome:'Pacote 100 un.',mult:1.8}];
+  let html='';
+  vendas.forEach((v,i)=>{
+    const pu=Math.ceil(tot*v.mult*10)/10,pp=pu*v.qtd,lucro=pp-tot*v.qtd;
+    html+=`<tr style="animation-delay:${i*90}ms"><td><strong>${v.nome}</strong></td><td data-l="Preço de cada peça">${money(pu)}</td><td data-l="Cliente paga"><strong>${money(pp)}</strong></td><td data-l="Seu lucro">${money(lucro)}</td></tr>`;
+  });
+  $('tabelaVendas').innerHTML=html;
+}
+let tm;
+document.querySelectorAll('.form input').forEach(i=>i.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(calcular,250)}));
+$('btnCalc').addEventListener('click',calcular);
+calcular();
 
-            tabelaHTML += `
-                <tr>
-                    <td><strong>${venda.nome}</strong></td>
-                    <td>R$ ${precoUnitario.toFixed(2)}</td>
-                    <td><strong>R$ ${precoPacote.toFixed(2)}</strong></td>
-                    <td style="color:#4caf50; font-weight:bold;">R$ ${lucro.toFixed(2)}</td>
-                </tr>
-            `;
-        });
-
-        document.getElementById('tabelaVendas').innerHTML = tabelaHTML;
-        document.getElementById('results').style.display = 'block';
-    }
+/* Instalação (PWA) */
+(function(){
+  const box=$('instalar'),btn=$('btnInstall'),tAnd=$('tutAndroid'),tIos=$('tutIos');
+  if(matchMedia('(display-mode: standalone)').matches||navigator.standalone){box.style.display='none';document.querySelector('.nav a[href="#instalar"]').style.display='none';return}
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  let prompt=null;(ios?tIos:tAnd).open=true;
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e});
+  addEventListener('appinstalled',()=>{box.style.display='none'});
+  btn.addEventListener('click',async()=>{
+    if(prompt){prompt.prompt();await prompt.userChoice;prompt=null}
+    else{(ios?tIos:tAnd).open=true;(ios?tIos:tAnd).scrollIntoView({behavior:'smooth',block:'center'})}
+  });
+})();
 </script>
 <script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));</script>
 </body>
